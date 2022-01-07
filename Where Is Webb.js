@@ -21,6 +21,8 @@ async function createWidget() {
   c1.layoutVertically();
   c2.layoutVertically();
 
+  c1.addText("Since Launch: ");
+  c2.addText(response.launchElapsedTime);
   c1.addText("From Earth: ");
   c2.addText(response.distanceEarthKm + " km");
   c1.addText("To L2: ");
