@@ -9,3 +9,9 @@ Thanks to [@avatsaev](https://github.com/avatsaev) for their [public api](https:
 
 ## Preview
 ![Screenshot](screenshot.jpeg)
+
+## Links
+[1] James Webb Space Telescope: https://www.jwst.nasa.gov/index.html <br/>
+[2] Where is Webb Web-App: https://www.jwst.nasa.gov/content/webbLaunch/whereIsWebb.html <br/>
+[3] webb tracker api project: https://github.com/avatsaev/webb-tracker-api <br/>
+[4] REST api: https://api.jwst-hub.com/track 
