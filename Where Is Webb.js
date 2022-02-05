@@ -2,42 +2,57 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-gray; icon-glyph: space-shuttle;
 
+/**
+ * @typedef Temps
+ * @type {object}
+ * @property {number} tempWarmSide1C
+ * @property {number} tempWarmSide2C
+ * @property {number} tempCoolSide1C
+ * @property {number} tempCoolSide2C
+ * @property {number} tempInstMiriC
+ * @property {number} tempInstNirCamC
+ * @property {number} tempInstNirSpecC
+ * @property {number} tempInstFgsNirissC
+ * @property {number} tempInstFsmC
+  */
+/**
+ * @typedef TrackingResponse
+ * @type {object}
+ * @property {string} deploymentImgURL
+ * @property {Temps} tempC
+ * @property {string} timestamp
+ */
+
+
+/**
+* @typedef CurrentState
+* @type {object}
+* @property {string} launchDateTimeString
+* @property {number} tempWarmSide1C
+* @property {number} tempWarmSide2C
+* @property {number} tempCoolSide1C
+* @property {number} tempCoolSide2C
+* @property {number} tempInstMiriK
+* @property {number} tempInstNirCamK
+* @property {number} tempInstNirSpecK
+* @property {number} tempInstFgsNirissK
+* @property {number} tempInstFsmK
+*/
+/**
+ * @typedef FlightCurrentState2
+ * @type {object}
+ * @property {CurrentState} currentState
+ */
+
 async function createWidget() {
   let w = new ListWidget();
   let title = w.addText("Where is Webb?");
   w.addSpacer();
   title.font = Font.largeTitle();
   title.centerAlignText();
-  let request = new Request("https://api.jwst-hub.com/track");
-
-  /**
-   * @typedef Temps
-   * @type {object}
-   * @property {number} tempWarmSide1C
-   * @property {number} tempWarmSide2C
-   * @property {number} tempCoolSide1C
-   * @property {number} tempCoolSide2C
-   * @property {number} tempInstMiriC
-   * @property {number} tempInstNirCamC
-   * @property {number} tempInstNirSpecC
-   * @property {number} tempInstFgsNirissC
-   * @property {number} tempInstFsmC
-    */
-  /**
-   * @typedef TrackingResponse
-   * @type {object}
-   * @property {string} deploymentImgURL
-   * @property {Temps} tempC
-   * @property {string} timestamp
-   */
-
-  /**
-   *  @type {TrackingResponse}
-  */
-  let response = await request.loadJSON();
   let sensors = await new Request("https://www.jwst.nasa.gov/content/webbLaunch/assets/images/extra/webbTempLocationsGradient1.4TweenAll-300px.jpg").loadImage();
-
   w.addImage(sensors).centerAlignImage();;
+
   let row = w.addStack();
   row.centerAlignContent();
   row.addSpacer();
@@ -47,35 +62,56 @@ async function createWidget() {
   c1.layoutVertically();
   c2.layoutVertically();
 
-  // c1.addText("Since Launch: ");
-  // c2.addText(response.launchElapsedTime);
-  // c1.addText("From Earth: ");
-  // c2.addText(response.distanceEarthKm + " km");
-  // c1.addText("To L2: ");
-  // c2.addText(response.distanceL2Km + " km");
-  // c1.addText("Speed:");
-  // c2.addText(response.speedKmS + " km/s");
-  let temp = response.tempC;
-  c1.addText("Warm Side")
-  c1.addText(temp.tempWarmSide1C + " °C (a)");
-  c1.addText(temp.tempWarmSide2C + " °C (b)" );
-  c2.addText("Cool Side")
-  c2.addText(temp.tempCoolSide1C + " °C (c)");
-  c2.addText(temp.tempCoolSide2C + " °C (d)");
-  c1.addText("MIRI/NIRCam/\nNirSpec")
-  c1.addText(temp.tempInstMiriC + " °C (1)")
-  c1.addText(temp.tempInstNirCamC + " °C (2)")
-  c1.addText(temp.tempInstNirSpecC + " °C (3)")
-  c2.addText("FGS-NIRISS/FSM")
-  c2.addText(temp.tempInstFgsNirissC + " °C (4)")
-  c2.addText(temp.tempInstFsmC + " °C (5)")
+  try {
 
-  
-  w.addText(response.currentDeploymentStep);
-  
-  let image = await new Request(response.deploymentImgURL).loadImage();
-  w.addImage(image).centerAlignImage();
-  log(response);
+    let request = new Request("https://api.jwst-hub.co/track");
+    /** @type {TrackingResponse} */
+    let response = await request.loadJSON();
+    log(response);
+
+    let temp = response.tempC;
+    c1.addText("Warm Side")
+    c1.addText(temp.tempWarmSide1C + " °C (a)");
+    c1.addText(temp.tempWarmSide2C + " °C (b)");
+    c2.addText("Cool Side")
+    c2.addText(temp.tempCoolSide1C + " °C (c)");
+    c2.addText(temp.tempCoolSide2C + " °C (d)");
+    c1.addText("MIRI/NIRCam/\nNirSpec")
+    c1.addText(temp.tempInstMiriC + " °C (1)")
+    c1.addText(temp.tempInstNirCamC + " °C (2)")
+    c1.addText(temp.tempInstNirSpecC + " °C (3)")
+    c2.addText("FGS-NIRISS/FSM")
+    c2.addText(temp.tempInstFgsNirissC + " °C (4)")
+    c2.addText(temp.tempInstFsmC + " °C (5)")
+
+
+    w.addText(response.currentDeploymentStep);
+
+    let image = await new Request(response.deploymentImgURL).loadImage();
+    w.addImage(image).centerAlignImage();
+  } catch {
+
+    // fallback to jwst api
+    let request2 = new Request("https://www.jwst.nasa.gov/content/webbLaunch/flightCurrentState2.0.json");
+    /** @type {FlightCurrentState2} */
+    let currentState = request2.loadJSON();
+    // c1.addText("Since Launch: ");
+    // c2.addText(response.launchElapsedTime);
+    let temp = currentState.currentState;
+    c1.addText("Warm Side")
+    c1.addText(temp.tempWarmSide1C + " °C (a)");
+    c1.addText(temp.tempWarmSide2C + " °C (b)");
+    c2.addText("Cool Side")
+    c2.addText(temp.tempCoolSide1C + " °C (c)");
+    c2.addText(temp.tempCoolSide2C + " °C (d)");
+    c1.addText("MIRI/NIRCam/\nNirSpec")
+    c1.addText(temp.tempInstMiriK + 273.15 + " °C (1)")
+    c1.addText(temp.tempInstNirCamK + 273.15 + " °C (2)")
+    c1.addText(temp.tempInstNirSpecK + 273.15 + " °C (3)")
+    c2.addText("FGS-NIRISS/FSM")
+    c2.addText(temp.tempInstFgsNirissK + 273.15 + " °C (4)")
+    c2.addText(temp.tempInstFsmK + 273.15 + " °C (5)")
+  }
   return w;
 }
 
