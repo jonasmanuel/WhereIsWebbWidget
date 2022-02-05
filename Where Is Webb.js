@@ -94,7 +94,7 @@ async function createWidget() {
     // fallback to jwst api
     let request2 = new Request("https://www.jwst.nasa.gov/content/webbLaunch/flightCurrentState2.0.json");
     /** @type {FlightCurrentState2} */
-    let currentState = request2.loadJSON();
+    let currentState = await request2.loadJSON();
     // c1.addText("Since Launch: ");
     // c2.addText(response.launchElapsedTime);
     let temp = currentState.currentState;
@@ -105,16 +105,19 @@ async function createWidget() {
     c2.addText(temp.tempCoolSide1C + " °C (c)");
     c2.addText(temp.tempCoolSide2C + " °C (d)");
     c1.addText("MIRI/NIRCam/\nNirSpec")
-    c1.addText(temp.tempInstMiriK + 273.15 + " °C (1)")
-    c1.addText(temp.tempInstNirCamK + 273.15 + " °C (2)")
-    c1.addText(temp.tempInstNirSpecK + 273.15 + " °C (3)")
+    c1.addText(round(temp.tempInstMiriK + 273.15, 2) + " °C (1)")
+    c1.addText(round(temp.tempInstNirCamK + 273.15, 2) + " °C (2)")
+    c1.addText(round(temp.tempInstNirSpecK + 273.15, 2) + " °C (3)")
     c2.addText("FGS-NIRISS/FSM")
-    c2.addText(temp.tempInstFgsNirissK + 273.15 + " °C (4)")
-    c2.addText(temp.tempInstFsmK + 273.15 + " °C (5)")
+    c2.addText(round(temp.tempInstFgsNirissK + 273.15, 2) + " °C (4)")
+    c2.addText(round(temp.tempInstFsmK + 273.15, 2) + " °C (5)")
   }
   return w;
 }
-
+function round(num, precision) {
+  let multiplier = Math.pow(10, precision);
+  return Math.round(num * multiplier) / multiplier;
+}
 function drawProgress(percentageCompleted) {
   let total = Device.screenResolution().width - 240;
   let percentage = (total * percentageCompleted) / 100;
