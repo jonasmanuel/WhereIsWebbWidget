@@ -51,14 +51,15 @@ async function createWidget() {
   title.font = Font.largeTitle();
   title.centerAlignText();
   let sensors = await new Request("https://www.jwst.nasa.gov/content/webbLaunch/assets/images/extra/webbTempLocationsGradient1.4TweenAll-300px.jpg").loadImage();
-  w.addImage(sensors).centerAlignImage();;
-
+  
   let row = w.addStack();
-  row.centerAlignContent();
-  row.addSpacer();
+  // row.centerAlignContent();
+  // row.addSpacer();
   let c1 = row.addStack();
+  let center = row.addStack();
+  center.addImage(sensors).centerAlignImage();;
   let c2 = row.addStack();
-  row.addSpacer();
+  // row.addSpacer();
   c1.layoutVertically();
   c2.layoutVertically();
 
