@@ -64,7 +64,7 @@ async function createWidget() {
 
   try {
 
-    let request = new Request("https://api.jwst-hub.co/track");
+    let request = new Request("https://api.jwst-hub.com/track");
     /** @type {TrackingResponse} */
     let response = await request.loadJSON();
     log(response);
