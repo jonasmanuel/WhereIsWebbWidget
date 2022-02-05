@@ -105,12 +105,12 @@ async function createWidget() {
     c2.addText(temp.tempCoolSide1C + " °C (c)");
     c2.addText(temp.tempCoolSide2C + " °C (d)");
     c1.addText("MIRI/NIRCam/\nNirSpec")
-    c1.addText(round(temp.tempInstMiriK + 273.15, 2) + " °C (1)")
-    c1.addText(round(temp.tempInstNirCamK + 273.15, 2) + " °C (2)")
-    c1.addText(round(temp.tempInstNirSpecK + 273.15, 2) + " °C (3)")
+    c1.addText(round(temp.tempInstMiriK - 273.15, 2) + " °C (1)")
+    c1.addText(round(temp.tempInstNirCamK - 273.15, 2) + " °C (2)")
+    c1.addText(round(temp.tempInstNirSpecK - 273.15, 2) + " °C (3)")
     c2.addText("FGS-NIRISS/FSM")
-    c2.addText(round(temp.tempInstFgsNirissK + 273.15, 2) + " °C (4)")
-    c2.addText(round(temp.tempInstFsmK + 273.15, 2) + " °C (5)")
+    c2.addText(round(temp.tempInstFgsNirissK - 273.15, 2) + " °C (4)")
+    c2.addText(round(temp.tempInstFsmK - 273.15, 2) + " °C (5)")
   }
   return w;
 }
