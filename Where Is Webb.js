@@ -37,7 +37,7 @@ async function createWidget() {
   let response = await request.loadJSON();
   let sensors = await new Request("https://www.jwst.nasa.gov/content/webbLaunch/assets/images/extra/webbTempLocationsGradient1.4TweenAll-300px.jpg").loadImage();
 
-  w.addImage(sensors);
+  w.addImage(sensors).centerAlignImage();;
   let row = w.addStack();
   row.centerAlignContent();
   row.addSpacer();
@@ -62,7 +62,7 @@ async function createWidget() {
   c2.addText("Cool Side")
   c2.addText(temp.tempCoolSide1C + " °C (c)");
   c2.addText(temp.tempCoolSide2C + " °C (d)");
-  c1.addText("MIRI/NIRCam/NirSpec")
+  c1.addText("MIRI/NIRCam/\nNirSpec")
   c1.addText(temp.tempInstMiriC + " °C (1)")
   c1.addText(temp.tempInstNirCamC + " °C (2)")
   c1.addText(temp.tempInstNirSpecC + " °C (3)")
