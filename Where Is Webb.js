@@ -99,11 +99,11 @@ async function createWidget() {
     // c2.addText(response.launchElapsedTime);
     let temp = currentState.currentState;
     c1.addText("Warm Side")
-    c1.addText(temp.tempWarmSide1C + " °C (a)");
-    c1.addText(temp.tempWarmSide2C + " °C (b)");
+    c1.addText(round(temp.tempWarmSide1C, 2) + " °C (a)");
+    c1.addText(round(temp.tempWarmSide2C, 2) + " °C (b)");
     c2.addText("Cool Side")
-    c2.addText(temp.tempCoolSide1C + " °C (c)");
-    c2.addText(temp.tempCoolSide2C + " °C (d)");
+    c2.addText(round(temp.tempCoolSide1C, 2) + " °C (c)");
+    c2.addText(round(temp.tempCoolSide2C, 2) + " °C (d)");
     c1.addText("MIRI/NIRCam/\nNirSpec")
     c1.addText(round(temp.tempInstMiriK - 273.15, 2) + " °C (1)")
     c1.addText(round(temp.tempInstNirCamK - 273.15, 2) + " °C (2)")
