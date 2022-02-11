@@ -2,6 +2,10 @@
 // These must be at the very top of the file. Do not edit.
 // icon-color: deep-gray; icon-glyph: space-shuttle;
 
+const trackingApiUrl = "https://api.jwst-hub.com/track";
+const sensorImageUrl = "https://www.jwst.nasa.gov/content/webbLaunch/assets/images/extra/webbTempLocationsGradient1.4TweenAll-300px.jpg";
+
+const fallbackApiUrl = "https://www.jwst.nasa.gov/content/webbLaunch/flightCurrentState2.0.json";
 /**
  * @typedef Temps
  * @type {object}
@@ -45,19 +49,28 @@
  */
 
 async function createWidget() {
+
+
   let w = new ListWidget();
   let title = w.addText("Where is Webb?");
   w.addSpacer();
   title.font = Font.largeTitle();
   title.centerAlignText();
-  let sensors = await new Request("https://www.jwst.nasa.gov/content/webbLaunch/assets/images/extra/webbTempLocationsGradient1.4TweenAll-300px.jpg").loadImage();
-  
+
   let row = w.addStack();
   // row.centerAlignContent();
   // row.addSpacer();
   let c1 = row.addStack();
   let center = row.addStack();
-  center.addImage(sensors).centerAlignImage();;
+  try {
+
+
+    let sensors = await new Request(sensorImageUrl).loadImage();
+    center.addImage(sensors).centerAlignImage();;
+  } catch (e) {
+    logError(`Image could not be loaded: ${response.deploymentImgURL}: ${e}`);
+  }
+
   let c2 = row.addStack();
   // row.addSpacer();
   c1.layoutVertically();
@@ -65,7 +78,7 @@ async function createWidget() {
 
   try {
 
-    let request = new Request("https://api.jwst-hub.com/track");
+    let request = new Request(trackingApiUrl);
     /** @type {TrackingResponse} */
     let response = await request.loadJSON();
     log(response);
@@ -88,30 +101,39 @@ async function createWidget() {
 
     w.addText(response.currentDeploymentStep);
 
-    let image = await new Request(response.deploymentImgURL).loadImage();
-    w.addImage(image).centerAlignImage();
-  } catch {
+    try {
+      let image = await new Request(response.deploymentImgURL).loadImage();
+      w.addImage(image).centerAlignImage();
+    } catch (e) {
+      logError(`Image could not be loaded: ${response.deploymentImgURL}: ${e}`);
+    }
+  } catch (e) {
 
-    // fallback to jwst api
-    let request2 = new Request("https://www.jwst.nasa.gov/content/webbLaunch/flightCurrentState2.0.json");
-    /** @type {FlightCurrentState2} */
-    let currentState = await request2.loadJSON();
-    // c1.addText("Since Launch: ");
-    // c2.addText(response.launchElapsedTime);
-    let temp = currentState.currentState;
-    c1.addText("Warm Side")
-    c1.addText(round(temp.tempWarmSide1C, 2) + " °C (a)");
-    c1.addText(round(temp.tempWarmSide2C, 2) + " °C (b)");
-    c2.addText("Cool Side")
-    c2.addText(round(temp.tempCoolSide1C, 2) + " °C (c)");
-    c2.addText(round(temp.tempCoolSide2C, 2) + " °C (d)");
-    c1.addText("MIRI/NIRCam/\nNirSpec")
-    c1.addText(round(temp.tempInstMiriK - 273.15, 2) + " °C (1)")
-    c1.addText(round(temp.tempInstNirCamK - 273.15, 2) + " °C (2)")
-    c1.addText(round(temp.tempInstNirSpecK - 273.15, 2) + " °C (3)")
-    c2.addText("FGS-NIRISS/FSM")
-    c2.addText(round(temp.tempInstFgsNirissK - 273.15, 2) + " °C (4)")
-    c2.addText(round(temp.tempInstFsmK - 273.15, 2) + " °C (5)")
+    logError(`Data could not be loaded: ${e}`)
+    try {
+
+      // fallback to jwst api
+      let request2 = new Request(fallbackApiUrl);
+      /** @type {FlightCurrentState2} */
+      let currentState = await request2.loadJSON();
+      let temp = currentState.currentState;
+      c1.addText("Warm Side")
+      c1.addText(round(temp.tempWarmSide1C, 2) + " °C (a)");
+      c1.addText(round(temp.tempWarmSide2C, 2) + " °C (b)");
+      c2.addText("Cool Side")
+      c2.addText(round(temp.tempCoolSide1C, 2) + " °C (c)");
+      c2.addText(round(temp.tempCoolSide2C, 2) + " °C (d)");
+      c1.addText("MIRI/NIRCam/\nNirSpec")
+      c1.addText(round(temp.tempInstMiriK - 273.15, 2) + " °C (1)")
+      c1.addText(round(temp.tempInstNirCamK - 273.15, 2) + " °C (2)")
+      c1.addText(round(temp.tempInstNirSpecK - 273.15, 2) + " °C (3)")
+      c2.addText("FGS-NIRISS/FSM")
+      c2.addText(round(temp.tempInstFgsNirissK - 273.15, 2) + " °C (4)")
+      c2.addText(round(temp.tempInstFsmK - 273.15, 2) + " °C (5)")
+    } catch (e) {
+
+      w.addText(e);
+    }
   }
   return w;
 }
@@ -140,7 +162,11 @@ function drawProgress(percentageCompleted) {
 
 let widget = await createWidget();
 
-if (config.runsInWidget) Script.setWidget(widget);
-else widget.presentLarge();
+if (config.runsInWidget) {
+  Script.setWidget(widget);
+}
+else {
+  widget.presentLarge();
+}
 
 Script.complete();
