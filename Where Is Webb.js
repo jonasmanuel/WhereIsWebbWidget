@@ -102,7 +102,7 @@ async function createWidget() {
     w.addText(response.currentDeploymentStep);
 
     try {
-      let image = await new Request(response.deploymentImgURL).loadImage();
+      let image = await new Request(response.deploymentImgURL.replace("jwstdev","jwst")).loadImage();
       w.addImage(image).centerAlignImage();
     } catch (e) {
       logError(`Image could not be loaded: ${response.deploymentImgURL}: ${e}`);
@@ -160,13 +160,15 @@ function drawProgress(percentageCompleted) {
   return draw.getImage();
 }
 
-let widget = await createWidget();
+(async function () {
+  let widget = await createWidget();
 
-if (config.runsInWidget) {
-  Script.setWidget(widget);
-}
-else {
-  widget.presentLarge();
-}
+  if (config.runsInWidget) {
+    Script.setWidget(widget);
+  }
+  else {
+    widget.presentLarge();
+  }
 
-Script.complete();
+  Script.complete();
+})();
